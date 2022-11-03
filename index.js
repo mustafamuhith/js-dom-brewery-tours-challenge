@@ -8,6 +8,21 @@ const state = {
   states: [],
 };
 
+/**FILTERS */
+
+
+/**RENDER CODE */
+
+function renderAllStates() {
+    breweryListUl.innerHTML = "";
+
+    state.states.forEach((establishment) => {
+       const li = renderBrewery(establishment)
+
+       breweryListUl.appendChild(li)
+    })
+}
+
 function renderBrewery(establishment) {
   // create: 'li'
   const li = document.createElement("li");
@@ -18,7 +33,7 @@ function renderBrewery(establishment) {
 
   // div type 'brewery_type'
   const typeOfBrewery = document.createElement("div");
-  typeOfBrewery.setAttribute("class", ".type");
+  typeOfBrewery.setAttribute("class", ".type")
   typeOfBrewery.innerText = establishment.brewery_type;
 
   // section with class of 'address' e.g. title, address, postcode
@@ -41,8 +56,8 @@ function renderBrewery(establishment) {
   secondLineAddress.appendChild(boldSecondLineAddress);
 
   // append the section
-  brewerySection.appendChild(
-    breweryTitleAddress,
+  brewerySection.append(
+    addressHeading,
     firstLineAddress,
     secondLineAddress
   );
@@ -58,7 +73,7 @@ function renderBrewery(establishment) {
   phoneNumber.innerText = establishment.phone;
 
   // append section
-  phoneSection.appendChild(phoneHeading, phoneNumber);
+  phoneSection.append(phoneHeading, phoneNumber);
 
   // link section with class of link
   const linkSection = document.createElement("section");
@@ -72,7 +87,7 @@ function renderBrewery(establishment) {
   linkSection.appendChild(anchorTag);
 
   // append all to the li
-  li.appendChild(
+  li.append(
     nameOfBrewery,
     typeOfBrewery,
     brewerySection,
@@ -88,19 +103,87 @@ function renderBrewery(establishment) {
 // when the page loads call a function that make a get request
 
 function getAllStatesFromServer() {
-  console.log("getting all states");
 
   const uri = "https://api.openbrewerydb.org/breweries?per_page=50";
 
-  const result = fetch(uri)
+  fetch(uri)
     .then((response) => {
       return response.json();
     })
     .then((arrayOfStates) => {
-      console.log("response received from server:", arrayOfStates);
+      
+      state.states = arrayOfStates
+
+      renderAllStates()
     });
     
-  console.log(result);
 }
 
+function getAllMicroFromServer() {
+    let uri = "https://api.openbrewerydb.org/breweries?per_page=50?&by_type=micro"
+
+    fetch(uri) 
+    .then((response) => {
+        return response.json()
+    })
+    .then((arrayOfMicroBreweries) => {
+        state.states = arrayOfMicroBreweries
+        renderAllStates()
+    })
+}
+
+function getAllRegionalFromServer() {
+    const uri = "https://api.openbrewerydb.org/breweries?per_page=50?&by_type=regional"
+
+    fetch(uri)
+    .then((response) => {
+        return response.json()
+    })
+    .then((arrayOfRegionalBreweries) => {
+        state.states = arrayOfRegionalBreweries
+        renderAllStates()
+    }) 
+}
+
+function getAllBrewpubFromServer() {
+    const uri = "https://api.openbrewerydb.org/breweries?per_page=50?&by_type=brewpub"
+
+    fetch(uri)
+    .then((response) => {
+        return response.json()
+    })
+    .then((arrayOfBrewpubBreweries) => {
+        state.states = arrayOfBrewpubBreweries
+        renderAllStates()
+    })
+}
+
+const form = document.querySelector('form')
+form.addEventListener('submit', (event) => {
+  event.preventDefault()
+  // this function handles when the user submits a form (ie. clicked the "Search")
+  getAllBrewpubFromServer()
+})
+
+
+function typeFiltering() {
+
+    const select1 = document.querySelector("option")
+    select1.setAttribute("type", "submit")
+
+
+    select1.addEventListener("sumbit", (event) => {
+        event.preventDefault()
+
+        getAllMicroFromServer()
+    }
+    
+    )}
+
+
+
 getAllStatesFromServer();
+// getAllMicroFromServer()
+// getAllBrewpubFromServer()
+// getAllRegionalFromServer()
+
